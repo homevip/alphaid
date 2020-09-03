@@ -2,7 +2,7 @@
 
 namespace homevip;
 
-trait AlphaID
+class AlphaID
 {
     /**
      * 字符文件
@@ -13,11 +13,11 @@ trait AlphaID
 
 
     /**
-     * Undocumented variable
+     * 盐
      *
      * @var string
      */
-    protected $salt = 'homevip@126.com';
+    protected $salt = 'homevip';
 
 
     /**
@@ -26,6 +26,22 @@ trait AlphaID
      * @var string
      */
     protected $length  = '4';
+
+
+    /**
+     * 内部调用
+     *
+     * @param [type] $method
+     * @param [type] $args
+     * @return void
+     */
+    public function __call($method, $args)
+    {
+        // 打乱随机字符
+        $this->upset();
+
+        return call_user_func_array([$this, $method], $args);
+    }
 
 
     /**
@@ -60,8 +76,6 @@ trait AlphaID
      */
     private function encode(int $integer)
     {
-        $this->upset();
-
         $base  = strlen($this->alphabet);
 
         if (is_numeric($this->length)) {
@@ -91,8 +105,6 @@ trait AlphaID
      */
     private function decode(string $string)
     {
-        $this->upset();
-
         $base  = strlen($this->alphabet);
 
         $string  = strrev($string);
@@ -109,6 +121,7 @@ trait AlphaID
                 $out -= pow($base, $this->length);
             }
         }
+
         $out = sprintf('%F', $out);
         return substr($out, 0, strpos($out, '.'));
     }
